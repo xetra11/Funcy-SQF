@@ -6,6 +6,7 @@ This tool will create functions for ArmA 3 Mods.
 import argparse
 import os
 import logging
+from pathlib import Path
 
 PARSER = argparse.ArgumentParser(prog='Funcy v1.0.1', description='Creates SQF functions',
                                  epilog="When using Funcy without the template flag (-t) the" +
@@ -41,11 +42,12 @@ def check_prerequisites():
     """Checks if the prerequisites for the execution are met"""
     LOGGER.debug("check prerequisites...")
     has_addons = os.path.isdir("addons") and os.path.exists("addons")
-    addon_path = "addons/" + ARGS.addon
-    function_path = "{}/{}/fn_{}.sqf".format(addon_path, ARGS.category, ARGS.name)
+    addon_path = Path("addons/" + ARGS.addon)
+    function_path = Path("{}/{}/fn_{}.sqf".format(addon_path, ARGS.category, ARGS.name))
     already_exists = os.path.exists(function_path)
     has_addons_folder = os.path.isdir(addon_path) and os.path.exists(addon_path)
-    has_config_file = os.path.exists(addon_path + "/CfgFunctions.hpp")
+    has_category_folder = os.path.isdir(addon_path / ARGS.category) and os.path.exists(addon_path / ARGS.category)
+    has_config_file = os.path.exists(addon_path / "CfgFunctions.hpp")
 
     if already_exists:
         if not ARGS.overwrite:
@@ -60,6 +62,9 @@ def check_prerequisites():
         exit()
     if not has_addons_folder:
         LOGGER.error("%s could not be found in addons", ARGS.addon)
+        exit()
+    if not has_category_folder:
+        LOGGER.error("%s could not be found", addon_path / ARGS.category)
         exit()
     if not has_config_file:
         if ARGS.verbose:
@@ -163,8 +168,7 @@ def create_func_file():
     path_to_addon = "addons/" + ARGS.addon
     path_to_new_file = path_to_addon + "/" + ARGS.category + "/fn_" + ARGS.name + ".sqf"
     LOGGER.info("create function file %s", path_to_new_file)
-    
-    
+
     if ARGS.template:
         template = find_template()
         if ARGS.dryrun:
