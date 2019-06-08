@@ -62,6 +62,21 @@ class CfgFunctions
 ```
 Please stick to this if you are using `funcy` because the other "ways" of declaring functions is not yet implemented but will come for sure if requests are made for it.
 
+## Example Usage
+Let's say you have the following mod structure: `.../mymod/addons/core/helper/`. So you have in your mod an addon folder called `core` with all of your core functions/features in it. In there you separate your functions into subfolders or categories. Your `CfgFunctions.hpp` file however resides in the addon folder `core`. Now you want to add a new function to the `helper` category/subfolder. To do so place execute `funcy` from the `mymod` folder. The `funcy` tool itself can be anywhere on your system but it has to be executed from where it can find the `addons` folder of your mod. To add a new function type the following:
+
+```funcy mymod core myNewFunction helper```
+
+Funcy now creates a new function file called `fn_myNewFunction.sqf` in the category/subfolder `helper` which itself is in the addon folder `core`. Additionally `funcy` adds an entry to `.../mymod/addons/core/CfgFunctions.hpp`.
+
+## Advanced Usage
+
+### Overwrite functions
+If `funcy` detects that the function you want to add is already existing either as function file (.sqf) or is declared in the `CfgFunctions.hpp` config it will abort the operation to avoid accidental overwrites or duplicates. If you still want to overwrite the function you can add the `-o` or `--overwrite` option. `funcy` will then overwrite the function.
+
+### Dry-Run
+If you are unsure what `funcy` does to your `CfgFunctions.hpp` file or your mod directory but you still want to see how `funcy`'s CLI works you can use the `-d` or `--dry-run` option. This will log all the stuff that happens **without** changing anything. Use in combination with `-v` or `--verbose` to understand more about `funcy`'s process.
+
 
 
 
