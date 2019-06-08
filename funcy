@@ -44,10 +44,10 @@ def check_prerequisites():
     has_addons = os.path.isdir("addons") and os.path.exists("addons")
     addon_path = Path("addons/" + ARGS.addon)
     function_path = Path("{}/{}/fn_{}.sqf".format(addon_path, ARGS.category, ARGS.name))
-    already_exists = os.path.exists(function_path)
-    has_addons_folder = os.path.isdir(addon_path) and os.path.exists(addon_path)
-    has_category_folder = os.path.isdir(addon_path / ARGS.category) and os.path.exists(addon_path / ARGS.category)
-    has_config_file = os.path.exists(addon_path / "CfgFunctions.hpp")
+    already_exists = function_path.exists()
+    has_addons_folder = addon_path.is_dir() and addon_path.exists()
+    has_category_folder = (addon_path / ARGS.category).is_dir() and (addon_path / ARGS.category).exists()
+    has_config_file = (addon_path / "CfgFunctions.hpp").exists()
 
     if already_exists:
         if not ARGS.overwrite:
@@ -76,13 +76,12 @@ def check_prerequisites():
 def read_config():
     """Reads the existing configuration file that needs to be extended"""
     LOGGER.debug("parse old CfgFunctions.hpp...")
-    path_to_addon = "addons/" + ARGS.addon
-    path_to_config = path_to_addon + "/CfgFunctions.hpp"
+    path_to_addon = Path("addons/" + ARGS.addon)
+    path_to_config = path_to_addon / "CfgFunctions.hpp"
     LOGGER.info("open %s", path_to_config)
 
     with open(path_to_config, 'r') as config_file:
-        config_file_content = config_file.readlines()
-        return config_file_content
+        return config_file.readlines()
 
 def contains_substring(the_list, substring):
     """Checks if a given substring is contained in an element of the list of strings"""
@@ -124,8 +123,8 @@ def validate_config_format():
 def modify_config():
     """Modify the configuration file by adding the new function"""
     old_config = read_config()
-    path_to_addon = "addons/" + ARGS.addon
-    path_to_config = path_to_addon + "/CfgFunctions.hpp.tmp"
+    path_to_addon = Path("addons/" + ARGS.addon)
+    path_to_config = path_to_addon / "CfgFunctions.hpp.tmp"
     offset_to_functions = 1
     category = "\\{}\\addons\\{}\\{}".format(ARGS.tag, ARGS.addon, ARGS.category)
     LOGGER.debug("category string: %s", category)
@@ -156,7 +155,7 @@ def find_template():
     """Find the template file to use as content for the new function file"""
     LOGGER.info("read template file...")
     script_path = os.path.dirname(os.path.realpath(__file__))
-    path_to_template = script_path + "/template.fy"
+    path_to_template = Path(script_path + "/template.fy")
 
     with open(path_to_template, 'r') as template_file:
         temp_file = template_file.readlines()
@@ -165,8 +164,9 @@ def find_template():
 
 def create_func_file():
     """Creates a new function file in the category"""
-    path_to_addon = "addons/" + ARGS.addon
-    path_to_new_file = path_to_addon + "/" + ARGS.category + "/fn_" + ARGS.name + ".sqf"
+    path_to_addon = Path("addons/" + ARGS.addon)
+    file_name = "fn_" + ARGS.name + ".sqf"
+    path_to_new_file = path_to_addon / ARGS.category / file_name
     LOGGER.info("create function file %s", path_to_new_file)
 
     if ARGS.template:
@@ -188,9 +188,9 @@ def create_func_file():
 
 def commit_config_change():
     """Commit the temporary config file change"""
-    path_to_addon = "addons/" + ARGS.addon
-    path_to_temp_config = path_to_addon + "/CfgFunctions.hpp.tmp"
-    path_to_config = path_to_addon + "/CfgFunctions.hpp"
+    path_to_addon = Path("addons/" + ARGS.addon)
+    path_to_temp_config = path_to_addon / "CfgFunctions.hpp.tmp"
+    path_to_config = path_to_addon / "CfgFunctions.hpp"
     LOGGER.info("commit changes to %s", path_to_config)
     if ARGS.dryrun:
         LOGGER.info("*dry run* no commit needed")
@@ -211,3 +211,4 @@ validate_config_format()
 modify_config()
 create_func_file()
 commit_config_change()
+ 2
