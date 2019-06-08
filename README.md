@@ -1,30 +1,66 @@
 # Funcy SQF
+
+## Download
+
+[For Linux](https://github.com/xetra11/Funcy-SQF/releases/download/v1.1.0/funcy)
+
+[For Windows (untested)](https://github.com/xetra11/Funcy-SQF/releases/download/v1.1.0/funcy.fy)
+
+**You need to have Python 3 installed for `funcy` to work**
+
+
 ## Description
 I made this tool to get rid of the tedious job of defining functions and adding them to the CfgFunctions.hpp file.
 This tool was made for CoopR-Mod but I think it might be useful for others as well. The idea is to bind this tool to a workflow keybinding
 for instance in Emacs or IntelliJ. I bound it to a key in my Spacemacs (Emacs on steroids) and find it very convenient.
 ## How to use
 Place `funcy` in your mod directory where your `addons` folder is located. Funcy needs to know where your `addons` directory is and looks for it where it (the tool) is being executed. When executing `funcy` you have to provide specific parameters. `funcy --help` will give you a description how to use the tool.
-### Example
-Let's say you have a folder structure like this `/addons/core/functions/`. In the `functions` all you functins are in. Your `CfgFunctions.hpp` however is within `/addons/core/CfgFunctions.hpp`. This is the structure I use and for what `funcy` was build for. You can have different styles of defining functions in the `CfgFunctions.hpp` but only with one `funcy` is working at the moment.
+
+## CLI Doc
+```
+usage: Funcy v1.1.0 [-h] [-v] [-t] [-d] [-o] tag addon name [category]
+
+Creates SQF functions
+
+positional arguments:
+  tag              the tag of your mod
+  addon            the addon the function should be created for
+  name             name of the function (without fn prefix)
+  category         the category where the function is defined
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -v, --verbose    prints log messages to follow the process
+  -t, --template   uses a template for creating function files
+  -d, --dry-run    performs a dry run without changing any files
+  -o, --overwrite  overwrites existing function entry and file
+
+When using Funcy without the template flag (-t) the created function will be
+blank. To use a global template for all functions create a file called
+'template.fy' in the directory Funcy is in. When creating a function Funcy will
+take the content of this template file for all created functions. If you want to
+have a different template per category then put a 'template.fy' file into the
+specific directory ie. /addons/core/functions/template.py
+```
+
+### Prerequisites
+As prerequisite for `funcy` to work you need to have a mod/addon folder structure in terms of **Folder Path** which is described here: https://community.bistudio.com/wiki/Arma_3_Functions_Library (scroll down to the _Folder Path_ section)
+It describes a way to declare functions in the `CfgFunctions.hpp` file like this:
 
 ```
-class CfgFunctions {
-    class yourmod {
-        class yourmod_core_functions {
-            file = "x\coopr\addons\core\functions";
-            class foo {};
-            class bar {};
-            class test {};
-        }
-    }
-}
+class CfgFunctions
+{
+	class myTag
+	{
+		class myCategory
+		{
+			file = "myPath";
+			class myFunction {};
+		};
+	};
+};
 ```
-
-This part `class yourmod_core_functions` in the CfgFunctions file is mandatory to be defined exactly this way. In ArmA 3 it does not matter how you describe this class definition.
-
-If the above is setup exactly this way `funcy` is ready to use. Just give it the following parameters: `funcy yourmod core functions myNewFunction`. funcy should then create a new function called `class myNewFunction {}` in your CfgFunctions config file and create a new file called `fn_myNewFunction.sqf` in your `/addons/core/functions` directory.
-
+Please stick to this if you are using `funcy` because the other "ways" of declaring functions is not yet implemented but will come for sure if requests are made for it.
 
 
 
