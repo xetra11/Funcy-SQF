@@ -11,8 +11,8 @@
 
 ## Description
 I made this tool to get rid of the tedious job of defining functions and adding them to the CfgFunctions.hpp file.
-This tool was made for CoopR-Mod but I think it might be useful for others as well. The idea is to bind this tool to a workflow keybinding
-for instance in Emacs or IntelliJ. I bound it to a key in my Spacemacs (Emacs on steroids) and find it very convenient.
+This tool was made for CoopR-Mod. Its use-case is to be integrated into workflows via build-scripts, key-bindings (like Emacs or IntelliJ, etc.) for instance in Emacs or IntelliJ. I bound it to a key in my Spacemacs (Emacs on steroids) and find it very convenient.
+
 ## How to use
 Place `funcy` in your mod directory where your `addons` folder is located. Funcy needs to know where your `addons` directory is and looks for it where it (the tool) is being executed. When executing `funcy` you have to provide specific parameters. `funcy --help` will give you a description how to use the tool.
 
