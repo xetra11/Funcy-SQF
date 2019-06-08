@@ -55,7 +55,8 @@ def check_prerequisites():
             LOGGER.info("if you still want to create/overwrite it use the -o option")
             exit()
         else:
-            LOGGER.warning("function exists - will overwrite")
+            LOGGER.warning("function file already exists!")
+            LOGGER.warning("will overwrite file!")
 
     if not has_addons:
         LOGGER.error("no addons directory could be found at %s", os.getcwd())
@@ -120,6 +121,7 @@ def validate_config_format():
         LOGGER.error("the folder path is missing in CfgFunctions")
         LOGGER.error("was looking for: \"file = ...%s\"", category)
         exit()
+
 def modify_config():
     """Modify the configuration file by adding the new function"""
     old_config = read_config()
@@ -129,27 +131,40 @@ def modify_config():
     category = "\\{}\\addons\\{}\\{}".format(ARGS.tag, ARGS.addon, ARGS.category)
     LOGGER.debug("category string: %s", category)
     index_of_category = list_index_substring(old_config, category)
+    func_name = "class {} {{}}".format(ARGS.name)
+
     if index_of_category == -1:
         LOGGER.error("category for file could not be found")
         LOGGER.error("was looking for: \"file = ...%s\"", category)
         exit()
+
     LOGGER.debug("index of category is: %s", str(index_of_category))
     old_value = old_config[index_of_category + offset_to_functions]
     LOGGER.debug("old_value is: %s", old_value.strip())
     index_of_class = old_value.find("class")
     tabs = old_value[0:index_of_class]
-    func_name = "class {} {{}}".format(ARGS.name)
     LOGGER.info("add '%s' as new entry to CfgFunctions.hpp", func_name)
 
     if ARGS.dryrun:
         LOGGER.info("*dry run* will not write original config")
         return
 
-    old_config.insert(index_of_category + offset_to_functions, tabs + func_name + ";\n")
+    func_already_defined = contains_substring(old_config, func_name)
+
+    if func_already_defined:
+        LOGGER.warning("function name already defined in CfgFunctions.hpp!")
+        if ARGS.overwrite:
+            LOGGER.warning("overwrite is active - leave it as is")
+        else:
+            LOGGER.info("if you still want to create/overwrite it use the -o option")
+            exit()
+    else:
+        LOGGER.debug("creating temporary CfgFunctions file")
+        old_config.insert(index_of_category + offset_to_functions, tabs + func_name + ";\n")
 
     with open(path_to_config, 'w') as new_config_file:
+        LOGGER.debug("creating temporary CfgFunctions file")
         new_config_file.writelines(old_config)
-        new_config_file.close()
 
 def find_template():
     """Find the template file to use as content for the new function file"""
@@ -211,4 +226,4 @@ validate_config_format()
 modify_config()
 create_func_file()
 commit_config_change()
- 2
+
